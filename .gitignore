@@ -1,2 +1,3 @@
 .idea
-./afrobot_stm32_driver/.settings
+/afrobot_stm32_driver/.settings/
+/afrobot_stm32_driver/Debug/
