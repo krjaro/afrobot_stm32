@@ -67,6 +67,11 @@ void motorSetSpeed(motor *m, int duty_cycle){
 }
 
 void motorUpdatePulse(motor *m){
-	m->pulse_count = (uint16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
+	m->pulse_count = (int16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
 	__HAL_TIM_SET_COUNTER(m->enc_timer_handle, 0);
+}
+
+void motorCalculateSpeed(motor *m, int freq){
+	motorUpdatePulse(m);
+	m->speed = (m->pulse_count * freq * 60) / m->resolution ;
 }

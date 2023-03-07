@@ -42,8 +42,8 @@ typedef struct
 
 	//internal variables
 	uint16_t resolution;									// Motor encoder resolution
-	uint16_t pulse_count;									// Actual encoder pulses
-	double speed;											// Calculated motor speed (1/s)
+	int16_t pulse_count;									// Actual encoder pulses
+	double speed;											// Calculated motor speed (RPM = 1/min)
 
 }motor;
 
@@ -52,5 +52,6 @@ void motorInit(motor *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_chan
 void motorSetDirection(motor *, motor_dir);
 void motorSetSpeed(motor *, int);
 void motorUpdatePulse(motor *);
+void motorCalculateSpeed(motor *, int);
 
 #endif /* INC_MOTOR_H_ */

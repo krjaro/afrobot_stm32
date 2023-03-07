@@ -921,13 +921,7 @@ __weak void StartEncoderTask(void *argument)
   for(;;)
   {
 
-	  FRSpeed = __HAL_TIM_GET_COUNTER(&htim2)/10 ; //Ticks per second
-//	    char message[50] ;
-//        sprintf(message, "Wheel speed: FR= %.2f ; FL= %d ; BR= %d ; BL= %d\n\r", FRSpeed ,(int)__HAL_TIM_GET_COUNTER(&htim8),(int)__HAL_TIM_GET_COUNTER(&htim4),(int)__HAL_TIM_GET_COUNTER(&htim5));
-//        HAL_UART_Transmit(&huart3, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
-
-        TIM2->CNT = 0 ;
-
+	motorCalculateSpeed(&FR_motor, 10);
 
     osDelay(100);
   }
