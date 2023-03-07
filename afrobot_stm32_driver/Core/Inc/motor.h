@@ -23,7 +23,7 @@ typedef struct
 	// external variables
 	TIM_HandleTypeDef *enc_timer_handle;					// Encoder timer handle
 	TIM_HandleTypeDef *pwm_timer_handle;					// PWM timer handle
-	pwm_timer_channel pwm_timer_channel;					// PWM timer channel
+	pwm_timer_channel pwm_timer_ch;					// PWM timer channel
 
 	//internal variables
 	uint16_t resolution;									// Motor encoder resolution
@@ -32,6 +32,6 @@ typedef struct
 }motor;
 
 
-void motorInit(motor *m, TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch);
+void motorInit(motor *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel);
 
 #endif /* INC_MOTOR_H_ */

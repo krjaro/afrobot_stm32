@@ -28,6 +28,7 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
 
+#include <motor.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -131,7 +132,19 @@ void kierunekCallback(const std_msgs::Bool& msg);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+motor FR_motor ;
+motor FL_motor ;
+motor BR_motor ;
+motor BL_motor ;
+
 ros::NodeHandle nh;
+
+double FRSpeed = 0.0 ;
+float BRSpeed = 0.0 ;
+float FLSpeed = 0.0 ;
+float BLSpeed = 0.0 ;
+
 
 std_msgs::String str_msg ;
 ros::Publisher chatter("chatter", &str_msg);
@@ -218,12 +231,14 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
+
+  motorInit(&FR_motor, &htim2, &htim1, CH1);
+  motorInit(&FL_motor, &htim8, &htim1, CH2);
+  motorInit(&BR_motor, &htim4, &htim1, CH3);
+  motorInit(&BL_motor, &htim5, &htim1, CH4);
+
   setup();
 
-  HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -906,12 +921,15 @@ __weak void StartEncoderTask(void *argument)
   for(;;)
   {
 
-	    char message[50] ;
-        sprintf(message, "Encoder Ticks: FR= %d ; FL= %d ; BR= %d ; BL= %d\n\r", (int)__HAL_TIM_GET_COUNTER(&htim2),(int)__HAL_TIM_GET_COUNTER(&htim8),(int)__HAL_TIM_GET_COUNTER(&htim4),(int)__HAL_TIM_GET_COUNTER(&htim5));
-        HAL_UART_Transmit(&huart3, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+	  FRSpeed = __HAL_TIM_GET_COUNTER(&htim2)/10 ; //Ticks per second
+//	    char message[50] ;
+//        sprintf(message, "Wheel speed: FR= %.2f ; FL= %d ; BR= %d ; BL= %d\n\r", FRSpeed ,(int)__HAL_TIM_GET_COUNTER(&htim8),(int)__HAL_TIM_GET_COUNTER(&htim4),(int)__HAL_TIM_GET_COUNTER(&htim5));
+//        HAL_UART_Transmit(&huart3, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);
+
+        TIM2->CNT = 0 ;
 
 
-    osDelay(1000);
+    osDelay(100);
   }
   /* USER CODE END StartEncoderTask */
 }
