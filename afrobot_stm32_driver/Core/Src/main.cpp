@@ -232,10 +232,10 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
-  motorInit(&FR_motor, &htim2, &htim1, CH1);
-  motorInit(&FL_motor, &htim8, &htim1, CH2);
-  motorInit(&BR_motor, &htim4, &htim1, CH3);
-  motorInit(&BL_motor, &htim5, &htim1, CH4);
+  motorInit(&FR_motor, &htim2, &htim1, CH1, FR_DIR_PIN);
+  motorInit(&FL_motor, &htim8, &htim1, CH2, FL_DIR_PIN);
+  motorInit(&BR_motor, &htim4, &htim1, CH3, BR_DIR_PIN);
+  motorInit(&BL_motor, &htim5, &htim1, CH4, BL_DIR_PIN);
 
   setup();
 
