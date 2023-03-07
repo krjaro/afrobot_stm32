@@ -36,14 +36,14 @@ void motorInit(motor *m, TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim,
 
 	// Check if PWM works
 	motorSetDirection(m, FW);
-	__HAL_TIM_SET_COMPARE(pwm_tim, pwm_ch, 500);
-	HAL_Delay(5000);
-	__HAL_TIM_SET_COMPARE(pwm_tim, pwm_ch, 0);
+	motorSetSpeed(m, 500);
+	HAL_Delay(2000);
+	motorSetSpeed(m, 0);
 	HAL_Delay(500);
 	motorSetDirection(m, BW);
-	__HAL_TIM_SET_COMPARE(pwm_tim, pwm_ch, 500);
-	HAL_Delay(5000);
-	__HAL_TIM_SET_COMPARE(pwm_tim, pwm_ch, 0);
+	motorSetSpeed(m, 500);
+	HAL_Delay(2000);
+	motorSetSpeed(m, 0);
 	HAL_Delay(500);
 }
 
@@ -54,5 +54,15 @@ void motorSetDirection(motor *m, motor_dir dir){
 	else if (dir == 0)
 		HAL_GPIO_WritePin(GPIOG, m->dir_pin, GPIO_PIN_RESET);
 
+}
+
+void motorSetSpeed(motor *m, int duty_cycle){
+
+	if (duty_cycle > 900)
+		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 900);
+	else if(duty_cycle < 200 && duty_cycle > 0)
+		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 200);
+	else
+		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, duty_cycle);
 }
 
