@@ -66,3 +66,7 @@ void motorSetSpeed(motor *m, int duty_cycle){
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, duty_cycle);
 }
 
+void motorUpdatePulse(motor *m){
+	m->pulse_count = (uint16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
+	__HAL_TIM_SET_COUNTER(m->enc_timer_handle, 0);
+}
