@@ -29,7 +29,7 @@
 #include <std_msgs/Bool.h>
 
 #include <motor.h>
-#include <kinematics.h>
+#include <kinematic.hpp>
 
 /* USER CODE END Includes */
 
