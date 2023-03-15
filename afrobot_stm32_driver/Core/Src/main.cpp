@@ -17,8 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <main.hpp>
 #include "cmsis_os.h"
+#include <main.hpp>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -29,6 +29,8 @@
 #include <std_msgs/Bool.h>
 
 #include <motor.h>
+#include <kinematics.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,10 +69,10 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for EncoderTask */
-osThreadId_t EncoderTaskHandle;
-const osThreadAttr_t EncoderTask_attributes = {
-  .name = "EncoderTask",
+/* Definitions for MotorControlTask */
+osThreadId_t MotorControlTaskHandle;
+const osThreadAttr_t MotorControlTask_attributes = {
+  .name = "MotorControlTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -80,13 +82,6 @@ const osThreadAttr_t IMUTask_attributes = {
   .name = "IMUTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for ControlTask */
-osThreadId_t ControlTaskHandle;
-const osThreadAttr_t ControlTask_attributes = {
-  .name = "ControlTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for LCDTask */
 osThreadId_t LCDTaskHandle;
@@ -101,6 +96,21 @@ const osThreadAttr_t RosSerialTask_attributes = {
   .name = "RosSerialTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh1,
+};
+/* Definitions for MotorCommandQueue */
+osMessageQueueId_t MotorCommandQueueHandle;
+const osMessageQueueAttr_t MotorCommandQueue_attributes = {
+  .name = "MotorCommandQueue"
+};
+/* Definitions for IMUDataQueue */
+osMessageQueueId_t IMUDataQueueHandle;
+const osMessageQueueAttr_t IMUDataQueue_attributes = {
+  .name = "IMUDataQueue"
+};
+/* Definitions for LCDDataQueue */
+osMessageQueueId_t LCDDataQueueHandle;
+const osMessageQueueAttr_t LCDDataQueue_attributes = {
+  .name = "LCDDataQueue"
 };
 /* USER CODE BEGIN PV */
 uint8_t m_u8_uartBuffer = 43 ;
@@ -120,9 +130,8 @@ static void MX_TIM1_Init(void);
 static void MX_TIM5_Init(void);
 static void MX_TIM8_Init(void);
 void StartDefaultTask(void *argument);
-void StartEncoderTask(void *argument);
+void StartMotorControlTask(void *argument);
 void StartIMUTask(void *argument);
-void StartControlTask(void *argument);
 void StartLCDTask(void *argument);
 void StartRosSerialTask(void *argument);
 
@@ -256,6 +265,16 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of MotorCommandQueue */
+  MotorCommandQueueHandle = osMessageQueueNew (16, 256, &MotorCommandQueue_attributes);
+
+  /* creation of IMUDataQueue */
+  IMUDataQueueHandle = osMessageQueueNew (16, 256, &IMUDataQueue_attributes);
+
+  /* creation of LCDDataQueue */
+  LCDDataQueueHandle = osMessageQueueNew (16, 254, &LCDDataQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -264,14 +283,11 @@ int main(void)
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of EncoderTask */
-  EncoderTaskHandle = osThreadNew(StartEncoderTask, NULL, &EncoderTask_attributes);
+  /* creation of MotorControlTask */
+  MotorControlTaskHandle = osThreadNew(StartMotorControlTask, NULL, &MotorControlTask_attributes);
 
   /* creation of IMUTask */
   IMUTaskHandle = osThreadNew(StartIMUTask, NULL, &IMUTask_attributes);
-
-  /* creation of ControlTask */
-  ControlTaskHandle = osThreadNew(StartControlTask, NULL, &ControlTask_attributes);
 
   /* creation of LCDTask */
   LCDTaskHandle = osThreadNew(StartLCDTask, NULL, &LCDTask_attributes);
@@ -907,25 +923,22 @@ void StartDefaultTask(void *argument)
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_StartEncoderTask */
+/* USER CODE BEGIN Header_StartMotorControlTask */
 /**
-* @brief Function implementing the EncoderTask thread.
+* @brief Function implementing the MotorControlTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartEncoderTask */
-__weak void StartEncoderTask(void *argument)
+/* USER CODE END Header_StartMotorControlTask */
+__weak void StartMotorControlTask(void *argument)
 {
-  /* USER CODE BEGIN StartEncoderTask */
+  /* USER CODE BEGIN StartMotorControlTask */
   /* Infinite loop */
   for(;;)
   {
-
-	motorCalculateSpeed(&FR_motor, 10);
-
-    osDelay(100);
+    osDelay(1);
   }
-  /* USER CODE END StartEncoderTask */
+  /* USER CODE END StartMotorControlTask */
 }
 
 /* USER CODE BEGIN Header_StartIMUTask */
@@ -945,24 +958,6 @@ __weak void StartIMUTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartIMUTask */
-}
-
-/* USER CODE BEGIN Header_StartControlTask */
-/**
-* @brief Function implementing the ControlTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartControlTask */
-__weak void StartControlTask(void *argument)
-{
-  /* USER CODE BEGIN StartControlTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartControlTask */
 }
 
 /* USER CODE BEGIN Header_StartLCDTask */
