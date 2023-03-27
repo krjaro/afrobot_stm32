@@ -6,7 +6,6 @@
  */
 
 
-#include <main.hpp>
 #include <kinematic.hpp>
 
 

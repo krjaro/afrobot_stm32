@@ -5,7 +5,7 @@
  *      Author: krjar
  */
 
-#include <main.hpp>
+#include <motor.h>
 
 // Constants
 #define ENCODER_RESOLUTION		64
