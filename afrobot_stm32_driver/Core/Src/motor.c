@@ -35,16 +35,16 @@ void motorInit(motor *m, TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim,
 	HAL_Delay(10);
 
 	// Check if PWM works
-	motorSetDirection(m, FW);
-	motorSetSpeed(m, 500);
-	HAL_Delay(2000);
-	motorSetSpeed(m, 0);
-	HAL_Delay(500);
-	motorSetDirection(m, BW);
-	motorSetSpeed(m, 500);
-	HAL_Delay(2000);
-	motorSetSpeed(m, 0);
-	HAL_Delay(500);
+//	motorSetDirection(m, FW);
+//	motorSetSpeed(m, 500);
+//	HAL_Delay(2000);
+//	motorSetSpeed(m, 0);
+//	HAL_Delay(500);
+//	motorSetDirection(m, BW);
+//	motorSetSpeed(m, 500);
+//	HAL_Delay(2000);
+//	motorSetSpeed(m, 0);
+//	HAL_Delay(500);
 }
 
 void motorSetDirection(motor *m, motor_dir dir){
