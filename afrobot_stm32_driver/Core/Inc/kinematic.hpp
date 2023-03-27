@@ -14,6 +14,7 @@
 
 
 double * getForwardKinematics(geometry_msgs::TwistStamped *);
+double * getInverseKinematics(double *);
 
 
 #endif /* INC_KINEMATIC_HPP_ */
