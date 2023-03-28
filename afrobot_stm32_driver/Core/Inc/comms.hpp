@@ -12,17 +12,20 @@
 #include <ros.h>
 #include <FreeRTOS.h>
 #include <queue.h>
-
+#include <geometry_msgs/TwistStamped.h>
 
 typedef struct
 {
 	QueueHandle_t *cmdQHandle ;
+	QueueHandle_t *odomQHandle ;
+	QueueHandle_t *imuQHandle ;
 }comms;
 
 
-void commsInit();
+void commsInit(comms *, QueueHandle_t *, QueueHandle_t *, QueueHandle_t *);
 void commsSetup(void);
-void commsLoop(void);
+void commsLoop(comms *);
+void commandCallback(const geometry_msgs::TwistStamped &);
 
 
 #endif /* INC_COMMS_HPP_ */
