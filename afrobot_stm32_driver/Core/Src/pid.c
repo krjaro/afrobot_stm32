@@ -6,5 +6,28 @@
  */
 
 
+#include <pid.h>
 
 
+void pidInit(pid *p, float kp_init, float ki_init, float kd_init, int anti_windup_limit)
+{
+	p->previous_error = 0 ;
+	p->total_error = 0 ;
+
+	p->k_p = kp_init;
+	p->k_i = ki_init;
+	p->k_d = kd_init;
+
+	p->anti_windup = anti_windup_limit;
+}
+
+void pidReset(pid *p)
+{
+	p->previous_error = 0 ;
+	p->total_error = 0 ;
+}
+
+int pidCalculate(pid *p, float setpoint, float actual)
+{
+
+}

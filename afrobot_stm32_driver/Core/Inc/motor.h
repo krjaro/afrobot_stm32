@@ -43,7 +43,7 @@ typedef struct
 	//internal variables
 	uint16_t resolution;									// Motor encoder resolution
 	int16_t pulse_count;									// Actual encoder pulses
-	double speed;											// Calculated motor speed (RPM = 1/min)
+	float speed;											// Calculated motor speed (RPM = 1/min)
 
 }motor;
 
