@@ -22,7 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <kinematic.hpp>
+#include <comms.hpp>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

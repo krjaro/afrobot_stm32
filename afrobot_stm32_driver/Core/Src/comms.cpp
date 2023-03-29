@@ -7,8 +7,7 @@
 
 
 #include <comms.hpp>
-#include <nav_msgs/Odometry.h>
-#include <sensor_msgs/Imu.h>
+
 
 
 ros::NodeHandle nh ;

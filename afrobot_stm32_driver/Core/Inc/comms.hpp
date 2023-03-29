@@ -8,12 +8,14 @@
 #ifndef INC_COMMS_HPP_
 #define INC_COMMS_HPP_
 
+#include <main.hpp>
 #include <ros.h>
 #include <FreeRTOS.h>
 #include <queue.h>
-#include <geometry_msgs/TwistStamped.h>
-#include <main.hpp>
 #include <std_msgs/String.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/TwistStamped.h>
 
 typedef struct
 {
