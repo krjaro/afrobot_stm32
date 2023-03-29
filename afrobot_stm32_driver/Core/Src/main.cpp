@@ -17,21 +17,11 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "cmsis_os.h"
 #include <main.hpp>
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <cstdio>
-#include <string.h>
-#include <ros.h>
-#include <std_msgs/String.h>
-#include <std_msgs/Bool.h>
-
-#include <motor.h>
-#include <kinematic.hpp>
-#include <comms.hpp>
-
 
 /* USER CODE END Includes */
 
@@ -113,6 +103,11 @@ const osMessageQueueAttr_t IMUDataQueue_attributes = {
 osMessageQueueId_t LCDDataQueueHandle;
 const osMessageQueueAttr_t LCDDataQueue_attributes = {
   .name = "LCDDataQueue"
+};
+/* Definitions for OdomDataQueue */
+osMessageQueueId_t OdomDataQueueHandle;
+const osMessageQueueAttr_t OdomDataQueue_attributes = {
+  .name = "OdomDataQueue"
 };
 /* USER CODE BEGIN PV */
 uint8_t m_u8_uartBuffer = 43 ;
@@ -264,13 +259,16 @@ int main(void)
 
   /* Create the queue(s) */
   /* creation of MotorCommandQueue */
-  MotorCommandQueueHandle = osMessageQueueNew (16, 256, &MotorCommandQueue_attributes);
+  MotorCommandQueueHandle = osMessageQueueNew (10, 96, &MotorCommandQueue_attributes);
 
   /* creation of IMUDataQueue */
-  IMUDataQueueHandle = osMessageQueueNew (16, 256, &IMUDataQueue_attributes);
+  IMUDataQueueHandle = osMessageQueueNew (10, 344, &IMUDataQueue_attributes);
 
   /* creation of LCDDataQueue */
-  LCDDataQueueHandle = osMessageQueueNew (16, 254, &LCDDataQueue_attributes);
+  LCDDataQueueHandle = osMessageQueueNew (10, 8, &LCDDataQueue_attributes);
+
+  /* creation of OdomDataQueue */
+  OdomDataQueueHandle = osMessageQueueNew (10, 776, &OdomDataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
