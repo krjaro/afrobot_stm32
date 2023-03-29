@@ -32,6 +32,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <motor.h>
+#include <kinematic.hpp>
+#include <comms.hpp>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -55,9 +57,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-//rosSerial
-void setup(void);
-void loop(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

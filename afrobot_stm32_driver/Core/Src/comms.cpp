@@ -23,6 +23,8 @@ ros::Publisher imuPub("imu", &imu) ;
 ros::Subscriber<geometry_msgs::TwistStamped> commandSub("cmd_vel", &commandCallback);
 ros::Subscriber<std_msgs::String> lcdSub("lcd", &lcdCallback);
 
+uint8_t m_u8_uartBuffer = 43 ;
+
 void commsInit(comms *c, QueueHandle_t *cmd, QueueHandle_t *odo, QueueHandle_t *imu)
 {
 	c->cmdQHandle = cmd ;

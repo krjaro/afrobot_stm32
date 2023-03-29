@@ -110,7 +110,7 @@ const osMessageQueueAttr_t OdomDataQueue_attributes = {
   .name = "OdomDataQueue"
 };
 /* USER CODE BEGIN PV */
-uint8_t m_u8_uartBuffer = 43 ;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,7 +133,7 @@ void StartLCDTask(void *argument);
 void StartRosSerialTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-void kierunekCallback(const std_msgs::Bool& msg);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -144,51 +144,7 @@ motor FL_motor ;
 motor BR_motor ;
 motor BL_motor ;
 
-ros::NodeHandle nhdl;
 
-double FRSpeed = 0.0 ;
-float BRSpeed = 0.0 ;
-float FLSpeed = 0.0 ;
-float BLSpeed = 0.0 ;
-
-
-std_msgs::String str_msg ;
-ros::Publisher chatter("chatter", &str_msg);
-char hello[] = "Hello jetson" ;
-
-
-ros::Subscriber<std_msgs::Bool> kierunek("kierunek", &kierunekCallback);
-
-void kierunekCallback(const std_msgs::Bool& msg){
-	if (msg.data == 1)
-		HAL_GPIO_WritePin (GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
-	else if (msg.data == 0)
-		HAL_GPIO_WritePin (GPIOG, GPIO_PIN_14, GPIO_PIN_RESET);
-
-}
-
-
-
-
-
-void setup(void)
-{
-	 nhdl.initNode();
-	 nhdl.advertise(chatter);
-	 nhdl.subscribe(kierunek);
-}
-
-void loop(void)
-{
-
-	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-
-	str_msg.data = hello;
-	chatter.publish(&str_msg);
-
-	nhdl.spinOnce();
-
-}
 
 
 /* USER CODE END 0 */
@@ -238,7 +194,6 @@ int main(void)
   motorInit(&BR_motor, &htim4, &htim1, CH3, BR_DIR_PIN);
   motorInit(&BL_motor, &htim5, &htim1, CH4, BL_DIR_PIN);
 
-  setup();
 
   /* USER CODE END 2 */
 
@@ -987,7 +942,6 @@ __weak void StartRosSerialTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	loop();
     osDelay(1000);
   }
   /* USER CODE END StartRosSerialTask */
