@@ -13,6 +13,7 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <std_msgs/String.h>
 
 typedef struct
 {
@@ -26,6 +27,7 @@ void commsInit(comms *, QueueHandle_t *, QueueHandle_t *, QueueHandle_t *);
 void commsSetup(void);
 void commsLoop(comms *);
 void commandCallback(const geometry_msgs::TwistStamped &);
+void lcdCallback(const std_msgs::String &);
 
 
 #endif /* INC_COMMS_HPP_ */

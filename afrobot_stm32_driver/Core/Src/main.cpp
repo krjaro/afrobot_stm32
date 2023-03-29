@@ -30,6 +30,8 @@
 
 #include <motor.h>
 #include <kinematic.hpp>
+#include <comms.hpp>
+
 
 /* USER CODE END Includes */
 
@@ -147,7 +149,7 @@ motor FL_motor ;
 motor BR_motor ;
 motor BL_motor ;
 
-ros::NodeHandle nh;
+ros::NodeHandle nhdl;
 
 double FRSpeed = 0.0 ;
 float BRSpeed = 0.0 ;
@@ -158,6 +160,7 @@ float BLSpeed = 0.0 ;
 std_msgs::String str_msg ;
 ros::Publisher chatter("chatter", &str_msg);
 char hello[] = "Hello jetson" ;
+
 
 ros::Subscriber<std_msgs::Bool> kierunek("kierunek", &kierunekCallback);
 
@@ -171,19 +174,13 @@ void kierunekCallback(const std_msgs::Bool& msg){
 
 
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
-	nh.getHardware()->flush();
-}
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-  nh.getHardware()->reset_rbuf();
-}
 
 void setup(void)
 {
-	 nh.initNode();
-	 nh.advertise(chatter);
-	 nh.subscribe(kierunek);
+	 nhdl.initNode();
+	 nhdl.advertise(chatter);
+	 nhdl.subscribe(kierunek);
 }
 
 void loop(void)
@@ -194,7 +191,7 @@ void loop(void)
 	str_msg.data = hello;
 	chatter.publish(&str_msg);
 
-	nh.spinOnce();
+	nhdl.spinOnce();
 
 }
 
@@ -936,6 +933,7 @@ __weak void StartMotorControlTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+
     osDelay(1);
   }
   /* USER CODE END StartMotorControlTask */

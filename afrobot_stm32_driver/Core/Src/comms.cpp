@@ -8,17 +8,20 @@
 
 #include <comms.hpp>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Imu.h>
 
 
 ros::NodeHandle nh ;
 
 
 nav_msgs::Odometry odom ;
+sensor_msgs::Imu imu ;
 
 
-ros::Publisher odometry("odom", &odom) ;
-
-ros::Subscriber<geometry_msgs::TwistStamped> command("cmd_vel", &commandCallback);
+ros::Publisher odometryPub("odom", &odom) ;
+ros::Publisher imuPub("imu", &imu) ;
+ros::Subscriber<geometry_msgs::TwistStamped> commandSub("cmd_vel", &commandCallback);
+ros::Subscriber<std_msgs::String> lcdSub("lcd", &lcdCallback);
 
 void commsInit(comms *c, QueueHandle_t *cmd, QueueHandle_t *odo, QueueHandle_t *imu)
 {
@@ -31,7 +34,10 @@ void commsInit(comms *c, QueueHandle_t *cmd, QueueHandle_t *odo, QueueHandle_t *
 void commsSetup(void)
 {
 	nh.initNode();
-	nh.advertise(odometry);
+	nh.advertise(odometryPub);
+	nh.advertise(imuPub);
+	nh.subscribe(commandSub);
+	nh.subscribe(lcdSub);
 }
 
 void commsLoop(comms *c)
@@ -50,6 +56,10 @@ void commandCallback(const geometry_msgs::TwistStamped &msg)
 
 }
 
+void lcdCallback(const std_msgs::String &msg)
+{
+
+}
 
 
 // ------------------------- Change USART handling to ROSSerial
