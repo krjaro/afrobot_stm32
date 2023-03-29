@@ -263,15 +263,7 @@ int main(void)
   while (1)
   {
 
-//	if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 1)
-//	{
-//		TIM1->CCR4 = 500 ;
-//		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);}
-//	else
-//	{
-//		TIM1->CCR4 = 0 ;
-//		HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_4);
-//	}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -860,15 +852,6 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 1)
-	{
-		TIM1->CCR4 = 500 ;
-		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);}
-	else
-	{
-		TIM1->CCR4 = 0 ;
-		HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_4);
-	}
     osDelay(1);
   }
   /* USER CODE END 5 */
