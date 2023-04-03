@@ -179,6 +179,7 @@ int main(void)
 
   /* Communcations initialization*/
   commsInit();
+  commsSetup();
 
 
   /* USER CODE END 2 */

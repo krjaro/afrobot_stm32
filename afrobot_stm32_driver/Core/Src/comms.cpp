@@ -16,7 +16,7 @@ ros::NodeHandle nh ;
 nav_msgs::Odometry odom ;
 sensor_msgs::Imu imu ;
 
-
+// Definitions for publishers and subscribers
 ros::Publisher odometryPub("odom", &odom) ;
 ros::Publisher imuPub("imu", &imu) ;
 ros::Subscriber<geometry_msgs::TwistStamped> commandSub("cmd_vel", &commandCallback);
@@ -82,7 +82,7 @@ void commandCallback(const geometry_msgs::TwistStamped &msg)
 
 void lcdCallback(const std_msgs::String &msg)
 {
-
+	osMessageQueuePut(LCDDataQueueHandle, &msg, 0U, 0U);
 }
 
 
