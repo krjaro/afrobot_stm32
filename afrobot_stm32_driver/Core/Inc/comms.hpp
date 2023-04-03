@@ -16,9 +16,9 @@
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/TwistStamped.h>
 
-
+void commsInit(void);
 void commsSetup(void);
-void commsLoop();
+void commsLoop(void);
 void commandCallback(const geometry_msgs::TwistStamped &);
 void lcdCallback(const std_msgs::String &);
 

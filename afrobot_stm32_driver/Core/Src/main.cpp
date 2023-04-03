@@ -90,26 +90,7 @@ const osThreadAttr_t RosSerialTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh1,
 };
-/* Definitions for MotorCommandQueue */
-osMessageQueueId_t MotorCommandQueueHandle;
-const osMessageQueueAttr_t MotorCommandQueue_attributes = {
-  .name = "MotorCommandQueue"
-};
-/* Definitions for IMUDataQueue */
-osMessageQueueId_t IMUDataQueueHandle;
-const osMessageQueueAttr_t IMUDataQueue_attributes = {
-  .name = "IMUDataQueue"
-};
-/* Definitions for LCDDataQueue */
-osMessageQueueId_t LCDDataQueueHandle;
-const osMessageQueueAttr_t LCDDataQueue_attributes = {
-  .name = "LCDDataQueue"
-};
-/* Definitions for OdomDataQueue */
-osMessageQueueId_t OdomDataQueueHandle;
-const osMessageQueueAttr_t OdomDataQueue_attributes = {
-  .name = "OdomDataQueue"
-};
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -190,10 +171,14 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
+  /* Motors initialization*/
   motorInit(&FR_motor, &htim2, &htim1, CH1, FR_DIR_PIN);
   motorInit(&FL_motor, &htim8, &htim1, CH2, FL_DIR_PIN);
   motorInit(&BR_motor, &htim4, &htim1, CH3, BR_DIR_PIN);
   motorInit(&BL_motor, &htim5, &htim1, CH4, BL_DIR_PIN);
+
+  /* Communcations initialization*/
+  commsInit();
 
 
   /* USER CODE END 2 */
@@ -213,18 +198,6 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
-  /* Create the queue(s) */
-  /* creation of MotorCommandQueue */
-  MotorCommandQueueHandle = osMessageQueueNew (10, 96, &MotorCommandQueue_attributes);
-
-  /* creation of IMUDataQueue */
-  IMUDataQueueHandle = osMessageQueueNew (10, 344, &IMUDataQueue_attributes);
-
-  /* creation of LCDDataQueue */
-  LCDDataQueueHandle = osMessageQueueNew (10, 8, &LCDDataQueue_attributes);
-
-  /* creation of OdomDataQueue */
-  OdomDataQueueHandle = osMessageQueueNew (10, 776, &OdomDataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
