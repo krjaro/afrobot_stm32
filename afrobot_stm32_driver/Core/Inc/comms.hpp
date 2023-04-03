@@ -10,24 +10,15 @@
 
 #include <main.hpp>
 #include <ros.h>
-#include <FreeRTOS.h>
-#include <queue.h>
+#include <cmsis_os.h>
 #include <std_msgs/String.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/TwistStamped.h>
 
-typedef struct
-{
-	QueueHandle_t *cmdQHandle ;
-	QueueHandle_t *odomQHandle ;
-	QueueHandle_t *imuQHandle ;
-}comms;
 
-
-void commsInit(comms *, QueueHandle_t *, QueueHandle_t *, QueueHandle_t *);
 void commsSetup(void);
-void commsLoop(comms *);
+void commsLoop();
 void commandCallback(const geometry_msgs::TwistStamped &);
 void lcdCallback(const std_msgs::String &);
 

@@ -22,15 +22,9 @@ ros::Publisher imuPub("imu", &imu) ;
 ros::Subscriber<geometry_msgs::TwistStamped> commandSub("cmd_vel", &commandCallback);
 ros::Subscriber<std_msgs::String> lcdSub("lcd", &lcdCallback);
 
+osMessageQueueId_t CommandQueue ;
+
 uint8_t m_u8_uartBuffer = 43 ;
-
-void commsInit(comms *c, QueueHandle_t *cmd, QueueHandle_t *odo, QueueHandle_t *imu)
-{
-	c->cmdQHandle = cmd ;
-	c->odomQHandle = odo ;
-	c->imuQHandle = imu ;
-}
-
 
 void commsSetup(void)
 {
@@ -41,7 +35,7 @@ void commsSetup(void)
 	nh.subscribe(lcdSub);
 }
 
-void commsLoop(comms *c)
+void commsLoop()
 {
 	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // signalization that comms loop is executing
 
