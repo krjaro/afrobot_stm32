@@ -13,7 +13,7 @@
 #include <geometry_msgs/TwistStamped.h>
 
 
-double * getForwardKinematics(geometry_msgs::TwistStamped *);
+double * getForwardKinematics(geometry_msgs::Twist *);
 double * getInverseKinematics(double *);
 
 
