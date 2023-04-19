@@ -29,5 +29,26 @@ void pidReset(pid *p)
 
 int pidCalculate(pid *p, float setpoint, float actual)
 {
+	float error, pTerm, iTerm, dTerm ;
 
+	//Calculate errors
+	error = setpoint - actual ;
+	p->total_error += error ;
+
+	//Calculate regulators components values
+	pTerm = p->k_p * error ;
+	iTerm = p->k_i * p->total_error ;
+	dTerm = p->k_d * (error - p->previous_error) ;
+
+	//Apply anti-windup to integral
+	if (iTerm >= p->anti_windup)
+		iTerm = p->anti_windup;
+	else if (iTerm <= -p->anti_windup)
+		iTerm = -p->anti_windup;
+
+	//Save error for next iteration
+	p->previous_error = error ;
+
+	//Return regulator output as int
+	return (int)(pTerm + iTerm + dTerm) ;
 }

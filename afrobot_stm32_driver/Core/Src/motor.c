@@ -15,7 +15,7 @@
 // Functions definitions
 
 
-void motorInit(motor *m, TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin)
+void motorInit(motor *m, pid *controller,  TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin)
 {
 
 	// Assign external variables to motor structure
@@ -23,31 +23,25 @@ void motorInit(motor *m, TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim,
 	m->pwm_timer_handle = pwm_tim ;
 	m->pwm_timer_ch = pwm_ch ;
 	m->dir_pin = direction_pin ;
+	m->controller = controller ;
 
 	// Initialize internal variables
 	m->resolution = ENCODER_RESOLUTION * TIMER_ENCODER_TI1TI2 * MOTOR_GEAR ;
 	m->pulse_count = 0 ;
 	m->speed = 0 ;
+	m->speed_cmd = 0 ;
+	m->pwm_value = 0 ;
+	m->time = time(NULL);
 
 	// Initialize timers
 	HAL_TIM_Encoder_Start(enc_tim, TIM_CHANNEL_ALL);
 	HAL_TIM_PWM_Start(pwm_tim, pwm_ch);
 	HAL_Delay(10);
 
-	// Check if PWM works
-//	motorSetDirection(m, FW);
-//	motorSetSpeed(m, 500);
-//	HAL_Delay(2000);
-//	motorSetSpeed(m, 0);
-//	HAL_Delay(500);
-//	motorSetDirection(m, BW);
-//	motorSetSpeed(m, 500);
-//	HAL_Delay(2000);
-//	motorSetSpeed(m, 0);
-//	HAL_Delay(500);
 }
 
-void motorSetDirection(motor *m, motor_dir dir){
+void motorSetDirection(motor *m, motor_dir dir)
+{
 
 	if (dir == 1)
 		HAL_GPIO_WritePin(GPIOG, m->dir_pin, GPIO_PIN_SET);
@@ -56,7 +50,8 @@ void motorSetDirection(motor *m, motor_dir dir){
 
 }
 
-void motorSetSpeed(motor *m, int duty_cycle){
+void motorSetSpeed(motor *m, int duty_cycle)
+{
 
 	if (duty_cycle > 900)
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 900);
@@ -66,12 +61,38 @@ void motorSetSpeed(motor *m, int duty_cycle){
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, duty_cycle);
 }
 
-void motorUpdatePulse(motor *m){
+void motorUpdatePulse(motor *m)
+{
 	m->pulse_count = (int16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
 	__HAL_TIM_SET_COUNTER(m->enc_timer_handle, 0);
 }
 
-void motorCalculateSpeed(motor *m, int freq){
+void motorCalculateSpeed(motor *m, int freq)
+{
+	// Update pulse count
 	motorUpdatePulse(m);
-	m->speed = (m->pulse_count * freq * 60) / m->resolution ;
+	// Calculate actual wheel angular velocity (rad/s)
+	m->speed = ((m->pulse_count * freq) / m->resolution) * 3.14;
+
+}
+
+void motorRegulateSpeed(motor *m)
+{
+
+	motorCalculateSpeed(m, 100);
+
+	int output = pidCalculate(m->controller, m->speed_cmd, m->speed);
+
+	m->pwm_value = output ;
+
+	if (m->pwm_value >= 0)
+	{
+		motorSetDirection(m, FW);
+		motorSetSpeed(m, m->pwm_value);
+	}
+	else
+	{
+		motorSetDirection(m, BW);
+		motorSetSpeed(m, -m->pwm_value);
+	}
 }

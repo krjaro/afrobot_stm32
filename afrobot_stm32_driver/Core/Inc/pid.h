@@ -18,7 +18,7 @@ typedef struct
 	int anti_windup;
 }pid;
 
-void pidInit(pid *, float , float ,float ,int );
+void pidInit(pid *, float, float, float, int);
 void pidReset(pid *);
 int pidCalculate(pid *, float, float);
 
