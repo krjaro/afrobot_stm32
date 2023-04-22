@@ -55,9 +55,10 @@ typedef struct
 
 void motorInit(motor *, pid *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel, motor_dir_pin);
 void motorSetDirection(motor *, motor_dir);
-void motorSetSpeed(motor *, int);
+void motorSetPWM(motor *, int);
 void motorUpdatePulse(motor *);
 void motorCalculateSpeed(motor *, int);
 void motorRegulateSpeed(motor *);
+void motorSetSpeed(motor *, double);
 
 #endif /* INC_MOTOR_H_ */

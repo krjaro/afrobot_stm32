@@ -50,7 +50,7 @@ void motorSetDirection(motor *m, motor_dir dir)
 
 }
 
-void motorSetSpeed(motor *m, int duty_cycle)
+void motorSetPWM(motor *m, int duty_cycle)
 {
 
 	if (duty_cycle > 900)
@@ -88,11 +88,19 @@ void motorRegulateSpeed(motor *m)
 	if (m->pwm_value >= 0)
 	{
 		motorSetDirection(m, FW);
-		motorSetSpeed(m, m->pwm_value);
+		motorSetPWM(m, m->pwm_value);
 	}
 	else
 	{
 		motorSetDirection(m, BW);
-		motorSetSpeed(m, -m->pwm_value);
+		motorSetPWM(m, -m->pwm_value);
 	}
+}
+
+void motorSetSpeed(motor *m, double rps)
+{
+	if(rps != m->speed_cmd)
+		pidReset(m->controller);
+
+	m->speed_cmd = rps ;
 }
