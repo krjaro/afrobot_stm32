@@ -31,7 +31,8 @@ void motorInit(motor *m, pid *controller,  TIM_HandleTypeDef *enc_tim, TIM_Handl
 	m->speed = 0 ;
 	m->speed_cmd = 0 ;
 	m->pwm_value = 0 ;
-	m->time = time(NULL);
+	m->time = HAL_GetTick();
+
 
 	// Initialize timers
 	HAL_TIM_Encoder_Start(enc_tim, TIM_CHANNEL_ALL);
@@ -56,7 +57,7 @@ void motorSetPWM(motor *m, int duty_cycle)
 	if (duty_cycle > 900)
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 900);
 	else if(duty_cycle < 200 && duty_cycle > 0)
-		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 200);
+		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 100);
 	else
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, duty_cycle);
 }
@@ -67,23 +68,27 @@ void motorUpdatePulse(motor *m)
 	__HAL_TIM_SET_COUNTER(m->enc_timer_handle, 0);
 }
 
-void motorCalculateSpeed(motor *m, int freq)
+void motorCalculateSpeed(motor *m)
 {
+	// Calculate time since last encoder tick update
+	float timeElapsed = HAL_GetTick() - m->time ; //(ms)
 	// Update pulse count
 	motorUpdatePulse(m);
+	// Save this calculation time for next iteration
+	m->time = HAL_GetTick();
 	// Calculate actual wheel angular velocity (rad/s)
-	m->speed = ((m->pulse_count * freq) / m->resolution) * 3.14;
+	m->speed = ((m->pulse_count / timeElapsed) / m->resolution) * 6.28 * 1000; //(rad/s)
 
 }
 
 void motorRegulateSpeed(motor *m)
 {
 
-	motorCalculateSpeed(m, 100);
+	motorCalculateSpeed(m);
 
 	int output = pidCalculate(m->controller, m->speed_cmd, m->speed);
 
-	m->pwm_value = output ;
+	m->pwm_value += output ;
 
 	if (m->pwm_value >= 0)
 	{

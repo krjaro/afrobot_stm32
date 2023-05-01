@@ -48,7 +48,7 @@ typedef struct
 	float speed;											// Calculated wheel angular velocity (rad/s)
 	float speed_cmd;										// Set wheel angular velocity (rad/s)
 	int pwm_value ;											// Actual PWM signal value (0-1000)
-	timer_t time ;											// Last speed measure time (cpu ticks)
+	uint32_t time ;											// Last speed measure time (cpu ticks)
 
 }motor;
 
@@ -57,7 +57,7 @@ void motorInit(motor *, pid *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_tim
 void motorSetDirection(motor *, motor_dir);
 void motorSetPWM(motor *, int);
 void motorUpdatePulse(motor *);
-void motorCalculateSpeed(motor *, int);
+void motorCalculateSpeed(motor *);
 void motorRegulateSpeed(motor *);
 void motorSetSpeed(motor *, double);
 
