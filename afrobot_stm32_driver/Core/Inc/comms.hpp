@@ -8,19 +8,20 @@
 #ifndef INC_COMMS_HPP_
 #define INC_COMMS_HPP_
 
-#include <main.hpp>
 #include <ros.h>
 #include <cmsis_os.h>
 #include <std_msgs/String.h>
-#include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
-#include <geometry_msgs/TwistStamped.h>
+#include <geometry_msgs/Twist.h>
+#include <main.hpp>
+
 
 void commsInit(void);
 void commsSetup(void);
 void commsLoop(void);
-void commandCallback(const geometry_msgs::TwistStamped &);
+void commandCallback(const geometry_msgs::Twist &);
 void lcdCallback(const std_msgs::String &);
+void commsGetTwist(geometry_msgs::Twist *);
 
 
 #endif /* INC_COMMS_HPP_ */
