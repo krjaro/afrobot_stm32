@@ -17,13 +17,13 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <main.hpp>
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <kinematic.hpp>
 #include <comms.hpp>
+#include <main.hpp>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,7 +87,7 @@ const osThreadAttr_t LCDTask_attributes = {
 osThreadId_t RosSerialTaskHandle;
 const osThreadAttr_t RosSerialTask_attributes = {
   .name = "RosSerialTask",
-  .stack_size = 128 * 4,
+  .stack_size = 128 * 12,
   .priority = (osPriority_t) osPriorityHigh1,
 };
 
@@ -99,7 +99,7 @@ const osThreadAttr_t RosSerialTask_attributes = {
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_USART3_UART_Init(void);
+//static void MX_USART3_UART_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_TIM2_Init(void);
@@ -121,13 +121,25 @@ void StartRosSerialTask(void *argument);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+/* Motor structures */
 motor FR_motor ;
 motor FL_motor ;
 motor BR_motor ;
 motor BL_motor ;
 
+/* PID controllers structures */
+pid FR_pid ;
+pid FL_pid ;
+pid BR_pid ;
+pid BL_pid ;
 
-
+/* PID controllers variables */
+// Gains
+float kp = 1.0 ;
+float ki = 0.0 ;
+float kd = 0.0 ;
+// Anti-windup
+int windup = 100 ;
 
 /* USER CODE END 0 */
 
@@ -160,7 +172,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_USART3_UART_Init();
+//  MX_USART3_UART_Init();
   MX_I2C1_Init();
   MX_I2C2_Init();
   MX_TIM2_Init();
@@ -171,15 +183,25 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
-  /* Motors initialization*/
-  motorInit(&FR_motor, &htim2, &htim1, CH1, FR_DIR_PIN);
-  motorInit(&FL_motor, &htim8, &htim1, CH2, FL_DIR_PIN);
-  motorInit(&BR_motor, &htim4, &htim1, CH3, BR_DIR_PIN);
-  motorInit(&BL_motor, &htim5, &htim1, CH4, BL_DIR_PIN);
+  /* Pid controllers initialization */
+  pidInit(&FR_pid, kp, ki, kd, windup);
+  pidInit(&FL_pid, kp, ki, kd, windup);
+  pidInit(&BR_pid, kp, ki, kd, windup);
+  pidInit(&BL_pid, kp, ki, kd, windup);
 
-  /* Communcations initialization*/
+  /* Motors initialization*/
+  motorInit(&FR_motor, &FR_pid, &htim2, &htim1, CH1, FR_DIR_PIN);
+  motorInit(&FL_motor, &FL_pid, &htim8, &htim1, CH2, FL_DIR_PIN);
+  motorInit(&BR_motor, &BR_pid, &htim4, &htim1, CH3, BR_DIR_PIN);
+  motorInit(&BL_motor, &BL_pid, &htim5, &htim1, CH4, BL_DIR_PIN);
+
+
+
+  /* Communcations initialization */
   commsInit();
   commsSetup();
+
+
 
 
   /* USER CODE END 2 */
@@ -698,33 +720,33 @@ static void MX_USART1_UART_Init(void)
   * @param None
   * @retval None
   */
-static void MX_USART3_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART3_Init 0 */
-
-  /* USER CODE END USART3_Init 0 */
-
-  /* USER CODE BEGIN USART3_Init 1 */
-
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
-
-  /* USER CODE END USART3_Init 2 */
-
-}
+//static void MX_USART3_UART_Init(void)
+//{
+//
+//  /* USER CODE BEGIN USART3_Init 0 */
+//
+//  /* USER CODE END USART3_Init 0 */
+//
+//  /* USER CODE BEGIN USART3_Init 1 */
+//
+//  /* USER CODE END USART3_Init 1 */
+//  huart3.Instance = USART3;
+//  huart3.Init.BaudRate = 115200;
+//  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+//  huart3.Init.StopBits = UART_STOPBITS_1;
+//  huart3.Init.Parity = UART_PARITY_NONE;
+//  huart3.Init.Mode = UART_MODE_TX_RX;
+//  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+//  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+//  if (HAL_UART_Init(&huart3) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
+//  /* USER CODE BEGIN USART3_Init 2 */
+//
+//  /* USER CODE END USART3_Init 2 */
+//
+//}
 
 /**
   * Enable DMA controller clock
@@ -845,7 +867,25 @@ __weak void StartMotorControlTask(void *argument)
   for(;;)
   {
 
-    osDelay(1);
+	  geometry_msgs::Twist cmd ;
+	  double *w;
+
+
+	  commsGetTwist(&cmd);
+
+	  w = getForwardKinematics(&cmd);
+
+	  motorSetSpeed(&FR_motor, w[0]);
+	  motorSetSpeed(&FL_motor, w[1]);
+	  motorSetSpeed(&BR_motor, w[2]);
+	  motorSetSpeed(&BL_motor, w[3]);
+
+	  motorRegulateSpeed(&FR_motor);
+	  motorRegulateSpeed(&FL_motor);
+	  motorRegulateSpeed(&BR_motor);
+	  motorRegulateSpeed(&BL_motor);
+
+    osDelay(10);
   }
   /* USER CODE END StartMotorControlTask */
 }
@@ -900,7 +940,8 @@ __weak void StartRosSerialTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1000);
+	commsLoop();
+    osDelay(1);
   }
   /* USER CODE END StartRosSerialTask */
 }
