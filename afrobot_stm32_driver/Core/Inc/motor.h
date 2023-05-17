@@ -11,6 +11,7 @@
 #include "stm32f4xx_hal.h"
 #include <pid.h>
 #include <time.h>
+#include <mafilter.h>
 
 typedef enum
 {
@@ -42,6 +43,7 @@ typedef struct
 	pwm_timer_channel pwm_timer_ch;							// PWM timer channel
 	motor_dir_pin dir_pin;									// Motor direction set pin
 	pid *controller ;										// PID controller structure
+	filterType *filter ; 									// Filter for odometry
 	/* internal variables */
 	uint16_t resolution;									// Motor encoder resolution
 	int16_t pulse_count;									// Actual encoder pulses
@@ -53,7 +55,7 @@ typedef struct
 }motor;
 
 
-void motorInit(motor *, pid *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel, motor_dir_pin);
+void motorInit(motor *, pid *, filterType *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel, motor_dir_pin);
 void motorSetDirection(motor *, motor_dir);
 void motorSetPWM(motor *, int);
 void motorUpdatePulse(motor *);

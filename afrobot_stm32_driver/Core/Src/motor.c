@@ -15,7 +15,7 @@
 // Functions definitions
 
 
-void motorInit(motor *m, pid *controller,  TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin)
+void motorInit(motor *m, pid *controller, filterType *f,  TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin)
 {
 
 	// Assign external variables to motor structure
@@ -24,6 +24,7 @@ void motorInit(motor *m, pid *controller,  TIM_HandleTypeDef *enc_tim, TIM_Handl
 	m->pwm_timer_ch = pwm_ch ;
 	m->dir_pin = direction_pin ;
 	m->controller = controller ;
+	m->filter = f ;
 
 	// Initialize internal variables
 	m->resolution = ENCODER_RESOLUTION * TIMER_ENCODER_TI1TI2 * MOTOR_GEAR ;
@@ -54,18 +55,22 @@ void motorSetDirection(motor *m, motor_dir dir)
 void motorSetPWM(motor *m, int duty_cycle)
 {
 
-	if (duty_cycle > 900)
-		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 900);
-	else if(duty_cycle < 200 && duty_cycle > 0)
-		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 100);
-	else
+//	if (duty_cycle > 900)
+//		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 900);
+//	else if(duty_cycle < 200 && duty_cycle > 0)
+//		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, 100);
+//	else
 		__HAL_TIM_SET_COMPARE(m->pwm_timer_handle, m->pwm_timer_ch, duty_cycle);
 }
 
 void motorUpdatePulse(motor *m)
 {
-	m->pulse_count = (int16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
+	int16_t pulse = 0 ;
+	// Get pulse count
+	pulse = (int16_t)__HAL_TIM_GET_COUNTER(m->enc_timer_handle);
 	__HAL_TIM_SET_COUNTER(m->enc_timer_handle, 0);
+	// Moving average filter pulse count
+	m->pulse_count = filterCalculate(m->filter, pulse);
 }
 
 void motorCalculateSpeed(motor *m)
@@ -88,7 +93,7 @@ void motorRegulateSpeed(motor *m)
 
 	int output = pidCalculate(m->controller, m->speed_cmd, m->speed);
 
-	m->pwm_value += output ;
+	m->pwm_value = output ;
 
 	if (m->pwm_value >= 0)
 	{
@@ -104,8 +109,15 @@ void motorRegulateSpeed(motor *m)
 
 void motorSetSpeed(motor *m, double rps)
 {
+	// Reset pid if command changes
 	if(rps != m->speed_cmd)
 		pidReset(m->controller);
 
-	m->speed_cmd = rps ;
+	// Force limitation of wheel angular velocity -> 6.28 rad/s = 2 1/s
+	if(rps > 6.28)
+		m->speed_cmd = 6.28;
+	else if(rps < -6.28)
+		m->speed_cmd = -6.28;
+	else
+		m->speed_cmd = rps ;
 }
