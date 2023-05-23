@@ -33,6 +33,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include <motor.h>
 #include <pid.h>
+#include <mafilter.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

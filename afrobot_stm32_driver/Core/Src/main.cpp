@@ -133,9 +133,15 @@ pid FL_pid ;
 pid BR_pid ;
 pid BL_pid ;
 
+/* Filter structures */
+filterType FR_filter ;
+filterType FL_filter ;
+filterType BR_filter ;
+filterType BL_filter ;
+
 /* PID controllers variables */
 // Gains
-float kp = 1.0 ;
+float kp = 50.0 ;
 float ki = 0.0 ;
 float kd = 0.0 ;
 // Anti-windup
@@ -189,11 +195,17 @@ int main(void)
   pidInit(&BR_pid, kp, ki, kd, windup);
   pidInit(&BL_pid, kp, ki, kd, windup);
 
+  /* Filters initialization */
+  filterInit(&FR_filter);
+  filterInit(&FL_filter);
+  filterInit(&BR_filter);
+  filterInit(&BL_filter);
+
   /* Motors initialization*/
-  motorInit(&FR_motor, &FR_pid, &htim2, &htim1, CH1, FR_DIR_PIN);
-  motorInit(&FL_motor, &FL_pid, &htim8, &htim1, CH2, FL_DIR_PIN);
-  motorInit(&BR_motor, &BR_pid, &htim4, &htim1, CH3, BR_DIR_PIN);
-  motorInit(&BL_motor, &BL_pid, &htim5, &htim1, CH4, BL_DIR_PIN);
+  motorInit(&FR_motor, &FR_pid, &FR_filter, &htim2, &htim1, CH1, FR_DIR_PIN, 7680);
+  motorInit(&FL_motor, &FL_pid, &FL_filter, &htim8, &htim1, CH2, FL_DIR_PIN, 7680);
+  motorInit(&BR_motor, &BR_pid, &BR_filter, &htim4, &htim1, CH3, BR_DIR_PIN, 7680);
+  motorInit(&BL_motor, &BL_pid, &BL_filter, &htim5, &htim1, CH4, BL_DIR_PIN, 3840);
 
 
 
@@ -559,7 +571,7 @@ static void MX_TIM4_Init(void)
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
-  sConfig.IC1Polarity = TIM_ICPOLARITY_FALLING;
+  sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
   sConfig.IC1Filter = 15;
@@ -875,10 +887,12 @@ __weak void StartMotorControlTask(void *argument)
 
 	  w = getForwardKinematics(&cmd);
 
+
 	  motorSetSpeed(&FR_motor, w[0]);
 	  motorSetSpeed(&FL_motor, w[1]);
 	  motorSetSpeed(&BR_motor, w[2]);
 	  motorSetSpeed(&BL_motor, w[3]);
+
 
 	  motorRegulateSpeed(&FR_motor);
 	  motorRegulateSpeed(&FL_motor);
@@ -904,7 +918,7 @@ __weak void StartIMUTask(void *argument)
   for(;;)
   {
 
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartIMUTask */
 }
@@ -922,7 +936,7 @@ __weak void StartLCDTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartLCDTask */
 }
