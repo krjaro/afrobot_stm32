@@ -8,7 +8,7 @@
 #ifndef INC_MAFILTER_H_
 #define INC_MAFILTER_H_
 
-#define windowLength 30
+#define windowLength 50
 
 #include "stm32f4xx_hal.h"
 
