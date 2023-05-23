@@ -55,7 +55,7 @@ typedef struct
 }motor;
 
 
-void motorInit(motor *, pid *, filterType *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel, motor_dir_pin);
+void motorInit(motor *, pid *, filterType *, TIM_HandleTypeDef *, TIM_HandleTypeDef *, pwm_timer_channel, motor_dir_pin, uint16_t);
 void motorSetDirection(motor *, motor_dir);
 void motorSetPWM(motor *, int);
 void motorUpdatePulse(motor *);

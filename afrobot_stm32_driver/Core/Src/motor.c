@@ -15,7 +15,8 @@
 // Functions definitions
 
 
-void motorInit(motor *m, pid *controller, filterType *f,  TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin)
+void motorInit(motor *m, pid *controller, filterType *f,  TIM_HandleTypeDef *enc_tim, TIM_HandleTypeDef *pwm_tim, pwm_timer_channel pwm_ch, motor_dir_pin direction_pin,
+				uint16_t resolution)
 {
 
 	// Assign external variables to motor structure
@@ -27,7 +28,7 @@ void motorInit(motor *m, pid *controller, filterType *f,  TIM_HandleTypeDef *enc
 	m->filter = f ;
 
 	// Initialize internal variables
-	m->resolution = ENCODER_RESOLUTION * TIMER_ENCODER_TI1TI2 * MOTOR_GEAR ;
+	m->resolution = resolution ;
 	m->pulse_count = 0 ;
 	m->speed = 0 ;
 	m->speed_cmd = 0 ;
