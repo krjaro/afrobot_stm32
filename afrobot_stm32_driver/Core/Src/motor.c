@@ -114,11 +114,11 @@ void motorSetSpeed(motor *m, double rps)
 	if(rps != m->speed_cmd)
 		pidReset(m->controller);
 
-	// Force limitation of wheel angular velocity -> 6.28 rad/s = 2 1/s
-	if(rps > 6.28)
-		m->speed_cmd = 6.28;
-	else if(rps < -6.28)
-		m->speed_cmd = -6.28;
+	// Force limitation of wheel angular velocity -> 8 rad/s
+	if(rps > 8)
+		m->speed_cmd = 8;
+	else if(rps < -8)
+		m->speed_cmd = -8;
 	else
 		m->speed_cmd = rps ;
 }
