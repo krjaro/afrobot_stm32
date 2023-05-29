@@ -106,12 +106,13 @@ void motorRegulateSpeed(motor *m)
 		motorSetDirection(m, BW);
 		motorSetPWM(m, -m->pwm_value);
 	}
+
 }
 
 void motorSetSpeed(motor *m, double rps)
 {
-	// Reset pid if command changes
-	if(rps != m->speed_cmd)
+	// Reset pid if command is 0
+	if(rps == 0)
 		pidReset(m->controller);
 
 	// Force limitation of wheel angular velocity -> 8 rad/s
