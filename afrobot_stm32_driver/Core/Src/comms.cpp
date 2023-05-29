@@ -52,16 +52,6 @@ void commsSetup(void)
 
 void commsLoop()
 {
-//	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin); // signalization that comms loop is executing
-
-
-//	geometry_msgs::Twist testPub ;
-////	testPub.header.stamp.sec = ros::Time::now().sec ;
-//	testPub.angular.x = 666.0 ;
-//
-//	odometryPub.publish(&testPub);
-
-
 	watchdog += 1 ;
 
 	if (watchdog > 3000)
@@ -79,32 +69,27 @@ void commandCallback(const geometry_msgs::Twist &msg)
 
 void lcdCallback(const std_msgs::String &msg)
 {
-//	osMessageQueuePut(LCDDataQueueHandle, &msg, 0U, 0U);
+
 }
 
 
 void commsGetTwist(geometry_msgs::Twist *twist)
 {
-
 	twist->linear.x = cmdVelHolder.linear.x ;
 	twist->linear.y = cmdVelHolder.linear.y ;
 	twist->angular.z = cmdVelHolder.angular.z ;
-
 }
 
 
 // ------------------------- USART handling to ROSSerial
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-//	if (huart->Instance == USART1)
 	nh.getHardware()->flush();
 	watchdog = 0 ;
-
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-//	if (huart->Instance == USART1)
 	nh.getHardware()->reset_rbuf();
 }
 
