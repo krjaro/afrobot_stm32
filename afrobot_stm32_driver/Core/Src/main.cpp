@@ -147,6 +147,8 @@ float kd = 1.0 ;
 // Anti-windup
 int windup = 900 ;
 
+static uint32_t timerPub = HAL_GetTick() ;
+
 /* USER CODE END 0 */
 
 /**
@@ -954,6 +956,25 @@ __weak void StartRosSerialTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  if (HAL_GetTick() - timerPub >= 100)
+	  {
+		  geometry_msgs::Twist odom;
+		  double *twist, w[4];
+		  w[0] = FR_motor.speed;
+		  w[1] = FL_motor.speed;
+		  w[2] = BR_motor.speed;
+		  w[3] = BL_motor.speed;
+
+		  twist = getInverseKinematics(w);
+
+		  odom.linear.x = twist[0];
+		  odom.linear.y = twist[1];
+		  odom.angular.z = twist[2];
+
+		  odomPublish(odom);
+		  timerPub = HAL_GetTick();
+
+	  }
 	commsLoop();
     osDelay(1);
   }

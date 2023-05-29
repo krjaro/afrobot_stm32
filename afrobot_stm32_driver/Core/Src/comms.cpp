@@ -14,7 +14,6 @@ ros::NodeHandle nh ;
 
 int watchdog = 0 ;
 
-
 geometry_msgs::Twist odom ;
 sensor_msgs::Imu imu ;
 
@@ -32,13 +31,7 @@ static geometry_msgs::Twist cmdVelHolder;
 void commsInit(void)
 {
 
-//	  /* Create the queue(s) */
 
-//	  MotorCommandQueueHandle = osMessageQueueNew (10, 96, &MotorCommandQueue_attributes);
-//	  MotorPool = osMemoryPoolNew(1, 96, NULL);
-//	  IMUDataQueueHandle = osMessageQueueNew (10, 344, &IMUDataQueue_attributes);
-//	  LCDDataQueueHandle = osMessageQueueNew (10, 8, &LCDDataQueue_attributes);
-//	  OdomDataQueueHandle = osMessageQueueNew (10, 96, &OdomDataQueue_attributes);
 }
 
 void commsSetup(void)
@@ -58,6 +51,11 @@ void commsLoop()
 		NVIC_SystemReset();
 
 	nh.spinOnce();
+}
+
+void odomPublish(geometry_msgs::Twist &msg)
+{
+	odometryPub.publish(&msg);
 }
 
 void commandCallback(const geometry_msgs::Twist &msg)

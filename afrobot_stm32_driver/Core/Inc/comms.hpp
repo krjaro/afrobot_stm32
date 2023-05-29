@@ -20,6 +20,7 @@
 void commsInit(void);
 void commsSetup(void);
 void commsLoop(void);
+void odomPublish(geometry_msgs::Twist &);
 void commandCallback(const geometry_msgs::Twist &);
 void lcdCallback(const std_msgs::String &);
 void commsGetTwist(geometry_msgs::Twist *);
