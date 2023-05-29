@@ -141,11 +141,11 @@ filterType BL_filter ;
 
 /* PID controllers variables */
 // Gains
-float kp = 50.0 ;
-float ki = 0.0 ;
-float kd = 0.0 ;
+float kp = 10.0 ;
+float ki = 2.0 ;
+float kd = 1.0 ;
 // Anti-windup
-int windup = 100 ;
+int windup = 900 ;
 
 /* USER CODE END 0 */
 
