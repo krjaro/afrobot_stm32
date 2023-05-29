@@ -12,12 +12,14 @@
 
 ros::NodeHandle nh ;
 
+int watchdog = 0 ;
+
 
 geometry_msgs::Twist odom ;
 sensor_msgs::Imu imu ;
 
 // Definitions for publishers and subscribers
-ros::Publisher odometryPub("odom", &odom) ;
+ros::Publisher odometryPub("odom_stm32", &odom) ;
 ros::Publisher imuPub("imu", &imu) ;
 ros::Subscriber<geometry_msgs::Twist> commandSub("cmd_vel", &commandCallback);
 ros::Subscriber<std_msgs::String> lcdSub("lcd", &lcdCallback);
@@ -60,6 +62,11 @@ void commsLoop()
 //	odometryPub.publish(&testPub);
 
 
+	watchdog += 1 ;
+
+	if (watchdog > 3000)
+		NVIC_SystemReset();
+
 	nh.spinOnce();
 }
 
@@ -86,14 +93,18 @@ void commsGetTwist(geometry_msgs::Twist *twist)
 }
 
 
-// ------------------------- Change USART handling to ROSSerial
+// ------------------------- USART handling to ROSSerial
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
+//	if (huart->Instance == USART1)
 	nh.getHardware()->flush();
+	watchdog = 0 ;
+
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+//	if (huart->Instance == USART1)
 	nh.getHardware()->reset_rbuf();
 }
 

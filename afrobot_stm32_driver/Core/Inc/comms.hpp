@@ -8,6 +8,7 @@
 #ifndef INC_COMMS_HPP_
 #define INC_COMMS_HPP_
 
+#include "stm32f4xx_hal.h"
 #include <ros.h>
 #include <cmsis_os.h>
 #include <std_msgs/String.h>
